@@ -1,6 +1,6 @@
 # Raintech Hotel Booking Dashboard
 
-A modern, responsive, and interactive single-page application built for managing hotel room bookings, checking guests in and out, and visualizing operational status.
+> **Design Choice:** While the initial plan was to build this project using vanilla HTML, CSS, and JavaScript, **Svelte** was chosen as the framework. This approach eliminated the overhead of manually duplicating components (like headers and modals) across multiple files. Because Svelte compiles down to highly efficient vanilla JavaScript and offers a very simple, intuitive state management system, it allowed for much faster implementation of the core booking logic without overcomplicating the architecture.
 
 ## Core Features
 
