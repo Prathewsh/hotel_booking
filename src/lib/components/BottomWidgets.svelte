@@ -1,10 +1,10 @@
 <script lang="ts">
   const rooms = [
-    { code: 'R101', type: 'Deluxe Room', price: 3500, maxGuests: 2 },
-    { code: 'R102', type: 'Deluxe Room', price: 3500, maxGuests: 2 },
-    { code: 'R201', type: 'Executive Suite', price: 5800, maxGuests: 3 },
-    { code: 'R202', type: 'Executive Suite', price: 5800, maxGuests: 3 },
-    { code: 'R301', type: 'Family Room', price: 4200, maxGuests: 4 },
+    { code: 'R101', type: 'Deluxe Room', price: 3500, maxGuests: 2, status: 'available' },
+    { code: 'R102', type: 'Deluxe Room', price: 3500, maxGuests: 2, status: 'occupied' },
+    { code: 'R201', type: 'Executive Suite', price: 5800, maxGuests: 3, status: 'available' },
+    { code: 'R202', type: 'Executive Suite', price: 5800, maxGuests: 3, status: 'maintenance' },
+    { code: 'R301', type: 'Family Room', price: 4200, maxGuests: 4, status: 'available' },
   ];
 
   const roomImages: Record<string, string> = {
@@ -13,6 +13,14 @@
     R201: 'https://images.unsplash.com/photo-1590490360182-c33d05c9d5e3?q=80&w=200&auto=format&fit=crop',
     R202: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=200&auto=format&fit=crop',
     R301: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=200&auto=format&fit=crop',
+  };
+
+  const statusLabels: Record<string, string> = {
+    available: '✓ Available',
+    occupied: '⊘ Occupied',
+    dirty: '⊘ Dirty',
+    maintenance: '⊘ Maintenance',
+    blocked: '⊘ Blocked',
   };
 
   let selectedRoom = $state('');
@@ -38,6 +46,8 @@
   function validate() {
     error = '';
     if (!selectedRoom) { error = 'Please select a room.'; return false; }
+    if (!room) { error = 'Invalid room selected.'; return false; }
+    if (room.status !== 'available') { error = `${room.code} is currently ${room.status}. Only available rooms can be booked.`; return false; }
     if (!checkIn) { error = 'Please select a check-in date.'; return false; }
     if (!checkOut) { error = 'Please select a check-out date.'; return false; }
     if (checkIn < today) { error = 'Check-in date cannot be in the past.'; return false; }
@@ -58,22 +68,25 @@
   <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 h-full">
     <div class="flex items-center space-x-2 mb-4">
       <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
-      <h2 class="text-base font-bold text-gray-800">Room Overview</h2>
+      <h2 class="text-base font-bold text-gray-800">Going to Vacate Rooms</h2>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-      {#each rooms as r}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {#each rooms.filter(r => r.status === 'occupied') as r}
         <div class="flex items-start gap-3 relative">
-          <div class="w-20 h-14 bg-gray-200 rounded-lg overflow-hidden shrink-0">
+          <div class="w-24 h-16 bg-gray-200 rounded-lg overflow-hidden shrink-0">
             <img src={roomImages[r.code]} alt={r.code} class="w-full h-full object-cover" />
           </div>
-          <div class="flex flex-col pt-0.5">
-            <span class="text-sm font-bold text-gray-900">{r.code}</span>
-            <span class="text-[11px] font-medium text-gray-600 mt-0.5">{r.type}</span>
-            <span class="text-[11px] text-gray-400 font-medium mt-0.5">₹{r.price.toLocaleString()}/night · Max {r.maxGuests}</span>
+          <div class="flex flex-col pt-1">
+            <span class="text-sm font-bold text-gray-900">Room {r.code.replace('R', '')}</span>
+            <span class="text-xs font-semibold text-gray-800 mt-1">Departing <span class="font-normal text-gray-500">- Guest</span></span>
+            <span class="text-xs text-gray-500 font-medium mt-0.5">Check-Out Scheduled</span>
           </div>
         </div>
       {/each}
+      {#if rooms.filter(r => r.status === 'occupied').length === 0}
+        <div class="text-sm text-gray-500 italic mt-2">No rooms are currently occupied.</div>
+      {/if}
     </div>
   </div>
 
@@ -86,7 +99,7 @@
         <select id="room-select" bind:value={selectedRoom} class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 shadow-sm outline-none focus:border-gray-300 appearance-none bg-white cursor-pointer">
           <option value="">Select a room</option>
           {#each rooms as r}
-            <option value={r.code}>{r.code} — {r.type} (₹{r.price.toLocaleString()}/night, max {r.maxGuests})</option>
+            <option value={r.code}>{r.code} — {r.type} [{statusLabels[r.status]}] (₹{r.price.toLocaleString()}/night)</option>
           {/each}
         </select>
         <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
