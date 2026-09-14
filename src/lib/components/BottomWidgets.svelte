@@ -51,9 +51,9 @@
         </div>
       </div>
       
-      <button class="bg-[#a3ccaf] text-[#0f3d24] font-semibold text-[11px] py-1.5 px-2 rounded-lg flex items-center relative shadow-sm w-[130px] shrink-0">
-        <svg class="w-3.5 h-3.5 absolute left-2 text-[#0f3d24]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-        <div class="flex-1 text-center leading-[1.2rem]">
+      <button class="bg-[#a3ccaf] text-[#0f3d24] font-bold text-[10px] py-1.5 pl-2 pr-1 rounded-lg flex items-center shadow-sm w-[130px] shrink-0">
+        <svg class="w-3.5 h-3.5 shrink-0 text-[#0f3d24]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+        <div class="flex-1 text-center leading-tight">
           Cleaning done,<br/>ready<br/>to serve
         </div>
       </button>
