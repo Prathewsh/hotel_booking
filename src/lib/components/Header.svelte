@@ -1,5 +1,21 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   let searchQuery = $state("");
+  let now = $state(new Date());
+
+  onMount(() => {
+    const interval = setInterval(() => {
+      now = new Date();
+    }, 1000);
+    return () => clearInterval(interval);
+  });
+
+  const formattedDateTime = $derived(
+    now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) +
+    ' | ' +
+    now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+  );
 </script>
 
 <header
@@ -76,7 +92,7 @@
           d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
         ></path></svg
       >
-      Thu, Jul 23, 2026 | 9:30 AM
+      {formattedDateTime}
     </div>
     <button
       class="bg-[#2c4c7c] hover:bg-[#1f375a] text-white rounded-full px-4 py-2 text-sm font-medium flex items-center transition-colors shadow-sm"

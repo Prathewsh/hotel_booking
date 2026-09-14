@@ -24,7 +24,9 @@
   let showSuccessModal = $state(false);
   let lastBookedDetails = $state('');
 
-  const today = new Date().toISOString().split('T')[0];
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  const today = now.toISOString().slice(0, 16);
 
   const room = $derived(roomState.rooms.find(r => r.code === selectedRoom));
 
@@ -104,25 +106,22 @@
     <div class="flex flex-col gap-3 mb-4">
       <div class="relative">
         <label for="room-select" class="absolute -top-2 left-3 bg-white px-1 text-[11px] font-semibold text-slate-500 z-10">Room</label>
-        <select id="room-select" bind:value={selectedRoom} class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 shadow-sm outline-none focus:border-gray-300 appearance-none bg-white cursor-pointer">
+        <select id="room-select" bind:value={selectedRoom} class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 shadow-sm outline-none focus:border-gray-300 bg-white cursor-pointer">
           <option value="">Select a room</option>
           {#each roomState.rooms as r}
             <option value={r.code}>{r.code} — {r.type} [{statusLabels[r.status]}] (₹{r.price.toLocaleString()}/night)</option>
           {/each}
         </select>
-        <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-          <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </div>
       </div>
 
       <div class="grid grid-cols-2 gap-3">
         <div class="relative">
           <label for="check-in" class="absolute -top-2 left-3 bg-white px-1 text-[11px] font-semibold text-slate-500 z-10">Check-in</label>
-          <input type="date" id="check-in" bind:value={checkIn} min={today} class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 shadow-sm outline-none focus:border-gray-300" />
+          <input type="datetime-local" id="check-in" bind:value={checkIn} min={today} class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 shadow-sm outline-none focus:border-gray-300" />
         </div>
         <div class="relative">
           <label for="check-out" class="absolute -top-2 left-3 bg-white px-1 text-[11px] font-semibold text-slate-500 z-10">Check-out</label>
-          <input type="date" id="check-out" bind:value={checkOut} min={checkIn || today} class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 shadow-sm outline-none focus:border-gray-300" />
+          <input type="datetime-local" id="check-out" bind:value={checkOut} min={checkIn || today} class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 shadow-sm outline-none focus:border-gray-300" />
         </div>
       </div>
     </div>
