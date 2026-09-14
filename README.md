@@ -1,42 +1,41 @@
-# sv
+# Raintech Hotel Booking Dashboard
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A modern, responsive, and interactive single-page application built for managing hotel room bookings, checking guests in and out, and visualizing operational status.
 
-## Creating a project
+## Core Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **Interactive Dashboard Overview**: A centralized command center featuring quick actions, operational statistics, and real-time revenue tracking.
+- **Smart Check-in System**: 
+  - Allows selecting check-in and check-out dates and picking an available room.
+  - Dynamically filters the available rooms based on the number of guests.
+  - Automatically calculates the total number of nights and total price dynamically before booking.
+- **Guest Check-out & Invoicing**: 
+  - Vacates occupied rooms seamlessly.
+  - Generates a realistic, thermal-print style invoice receipt upon checkout, complete with an itemized breakdown, GST calculation, and an option to print.
+- **Global Search Functionality**: Search globally for rooms by code or type via the header search bar (or `Ctrl/Cmd K`), which opens a dropdown of matches and directly opens the booking modal pre-filled with the selected room.
+- **Interactive Floor Plan**: A visual representation of the hotel floors, indicating live room status (Available, Occupied, Dirty, Maintenance) via color-coded badges.
 
-```sh
-# create a new project
-npx sv create my-app
-```
+## Business Logic & Validation
 
-To recreate this project with the same configuration:
+The application handles rigorous client-side logic to ensure data integrity and prevent impossible states:
 
-```sh
-# recreate this project
-bun x sv@0.17.0 create --template minimal --types ts --add vitest="usages:unit,component" eslint tailwindcss="plugins:typography,forms" sveltekit-adapter="adapter:vercel" --install bun hotel_booking
-```
+### 1. Date & Pricing Calculations
+- **Duration**: Accurately calculates the exact number of nights between the check-in and check-out dates using timestamp differences.
+- **Same-day Bookings**: Uses `Math.ceil()` logic so that partial days (day-use) are correctly billed as a minimum of 1 night.
+- **Dynamic Total**: Real-time multiplication of calculated nights × the specific room's base price per night.
 
-## Developing
+### 2. Validation & Edge Cases
+- **Past Date Prevention**: HTML5 native `min` attributes and strict JavaScript validation ensure check-in dates cannot be in the past.
+- **Chronological Ranges**: Strictly enforces that the check-out date is logically after the check-in date.
+- **Clear Error Handling**: Rejects silent failures in favor of clear, descriptive UI error banners (e.g., "Check-out must be after check-in").
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### 3. Room Constraints (Bonus Features)
+- **Status Locks**: Only rooms with an `'available'` status can be booked. Attempting to book a room that is already "occupied" is prevented at both the UI dropdown level and the validation logic level.
+- **Max Guest Filtering**: Dynamically finds the absolute maximum room capacity in the hotel and restricts the guest input. When a guest count is entered, it filters out any rooms that cannot accommodate that party size.
 
-```sh
-npm run dev
+## Tech Stack & Architecture
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+- **Framework**: SvelteKit with Svelte 5 (leveraging modern `$state`, `$derived`, and `$effect` runes for fine-grained reactivity).
+- **Styling**: TailwindCSS for rapid, utility-first UI design, custom animations, and responsive layouts.
+- **State Management**: Centralized reactive state store (`roomStore.svelte.ts`) handling the mock room database, cumulative revenue tracking, and global UI modal states (`uiState`).
+- **Data Source**: Hardcoded sample data mock (No external API or Database dependencies required).
