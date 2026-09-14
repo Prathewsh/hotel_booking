@@ -2,9 +2,11 @@
   let {
     number,
     status = "available",
+    onclick,
   }: {
     number: string | number;
     status?: "available" | "occupied" | "dirty" | "maintenance" | "blocked";
+    onclick?: () => void;
   } = $props();
 
   const statusColors = {
@@ -17,7 +19,8 @@
 </script>
 
 <button
-  class={`w-[38px] h-[42px] flex items-center justify-center rounded text-xs font-semibold shadow-sm transition-transform hover:-translate-y-0.5 border ${statusColors[status]}`}
+  {onclick}
+  class={`w-[38px] h-[42px] flex items-center justify-center rounded text-xs font-semibold shadow-sm hover:shadow-md hover:brightness-95 cursor-pointer border transition-shadow ${statusColors[status]}`}
 >
   {number}
 </button>
