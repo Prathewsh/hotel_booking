@@ -74,7 +74,6 @@
 </script>
 
 <div class="grid grid-cols-1 md:grid-cols-[1fr_400px] gap-4 mt-4">
-
   <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 h-full">
     <div class="flex items-center space-x-2 mb-4">
       <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
@@ -83,7 +82,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {#each roomState.rooms.filter(r => r.status === 'occupied') as r}
-        <div class="flex items-start gap-3 relative">
+        <div class="flex items-start gap-3 relative bg-gray-50 p-3 rounded-lg border border-gray-100">
           <div class="w-24 h-16 bg-gray-200 rounded-lg overflow-hidden shrink-0">
             <img src={roomImages[r.code]} alt={r.code} class="w-full h-full object-cover" />
           </div>
@@ -95,7 +94,7 @@
         </div>
       {/each}
       {#if roomState.rooms.filter(r => r.status === 'occupied').length === 0}
-        <div class="text-sm text-gray-500 italic mt-2">No rooms are currently occupied.</div>
+        <div class="text-sm text-gray-500 italic mt-2 col-span-full">No rooms are currently occupied.</div>
       {/if}
     </div>
   </div>

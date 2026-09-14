@@ -1,22 +1,37 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import ComingSoonModal from './ComingSoonModal.svelte';
 
   let { 
     title = '', 
     iconBgColor = 'bg-gray-100', 
     iconColor = 'text-gray-500', 
     badge = null,
-    icon 
+    icon,
+    onclick,
+    comingSoon = false
   }: { 
     title: string; 
     iconBgColor?: string; 
     iconColor?: string; 
     badge?: { text: string; colorClass: string } | null;
     icon: Snippet;
+    onclick?: () => void;
+    comingSoon?: boolean;
   } = $props();
+
+  let isComingSoonOpen = $state(false);
+
+  function handleClick() {
+    if (comingSoon) {
+      isComingSoonOpen = true;
+    } else if (onclick) {
+      onclick();
+    }
+  }
 </script>
 
-<button class="relative bg-white rounded-xl py-5 px-3 shadow-sm hover:shadow-md transition-shadow border border-gray-100 flex flex-col items-center justify-center w-full gap-3 overflow-hidden group">
+<button onclick={handleClick} class="relative bg-white rounded-xl py-5 px-3 shadow-sm hover:shadow-md transition-shadow border border-gray-100 flex flex-col items-center justify-center w-full gap-3 overflow-hidden group">
   {#if badge}
     <div class={`absolute top-2 right-2 text-[10px] font-bold px-1.5 py-0.5 rounded-md ${badge.colorClass}`}>
       {badge.text}
@@ -31,3 +46,13 @@
     {title}
   </span>
 </button>
+
+{#if comingSoon}
+  <ComingSoonModal 
+    bind:isOpen={isComingSoonOpen} 
+    featureName={title} 
+    iconBgColor={iconBgColor} 
+    iconColor={iconColor} 
+    iconSnippet={icon} 
+  />
+{/if}
