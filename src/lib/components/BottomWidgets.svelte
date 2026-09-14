@@ -1,11 +1,5 @@
 <script lang="ts">
-  const rooms = [
-    { code: 'R101', type: 'Deluxe Room', price: 3500, maxGuests: 2, status: 'available' },
-    { code: 'R102', type: 'Deluxe Room', price: 3500, maxGuests: 2, status: 'occupied' },
-    { code: 'R201', type: 'Executive Suite', price: 5800, maxGuests: 3, status: 'available' },
-    { code: 'R202', type: 'Executive Suite', price: 5800, maxGuests: 3, status: 'maintenance' },
-    { code: 'R301', type: 'Family Room', price: 4200, maxGuests: 4, status: 'available' },
-  ];
+  import { roomState, type Status } from '$lib/stores/roomStore.svelte';
 
   const roomImages: Record<string, string> = {
     R101: 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=200&auto=format&fit=crop',
@@ -27,10 +21,12 @@
   let checkIn = $state('');
   let checkOut = $state('');
   let error = $state('');
+  let showSuccessModal = $state(false);
+  let lastBookedDetails = $state('');
 
   const today = new Date().toISOString().split('T')[0];
 
-  const room = $derived(rooms.find(r => r.code === selectedRoom));
+  const room = $derived(roomState.rooms.find(r => r.code === selectedRoom));
 
   const nights = $derived(() => {
     if (!checkIn || !checkOut) return 0;
@@ -58,7 +54,19 @@
   function handleBook() {
     if (validate()) {
       error = '';
-      alert(`Booked ${selectedRoom} for ${nights()} night(s) — Total: ₹${totalPrice().toLocaleString()}`);
+      lastBookedDetails = `Booked ${selectedRoom} for ${nights()} night(s) — Total: ₹${totalPrice().toLocaleString()}`;
+      
+      const idx = roomState.rooms.findIndex(r => r.code === selectedRoom);
+      if (idx !== -1) {
+        roomState.rooms[idx].status = 'occupied';
+      }
+      
+      roomState.revenue += totalPrice();
+      showSuccessModal = true;
+      
+      selectedRoom = '';
+      checkIn = '';
+      checkOut = '';
     }
   }
 </script>
@@ -72,7 +80,7 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      {#each rooms.filter(r => r.status === 'occupied') as r}
+      {#each roomState.rooms.filter(r => r.status === 'occupied') as r}
         <div class="flex items-start gap-3 relative">
           <div class="w-24 h-16 bg-gray-200 rounded-lg overflow-hidden shrink-0">
             <img src={roomImages[r.code]} alt={r.code} class="w-full h-full object-cover" />
@@ -84,7 +92,7 @@
           </div>
         </div>
       {/each}
-      {#if rooms.filter(r => r.status === 'occupied').length === 0}
+      {#if roomState.rooms.filter(r => r.status === 'occupied').length === 0}
         <div class="text-sm text-gray-500 italic mt-2">No rooms are currently occupied.</div>
       {/if}
     </div>
@@ -98,7 +106,7 @@
         <label for="room-select" class="absolute -top-2 left-3 bg-white px-1 text-[11px] font-semibold text-slate-500 z-10">Room</label>
         <select id="room-select" bind:value={selectedRoom} class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 shadow-sm outline-none focus:border-gray-300 appearance-none bg-white cursor-pointer">
           <option value="">Select a room</option>
-          {#each rooms as r}
+          {#each roomState.rooms as r}
             <option value={r.code}>{r.code} — {r.type} [{statusLabels[r.status]}] (₹{r.price.toLocaleString()}/night)</option>
           {/each}
         </select>
@@ -138,8 +146,23 @@
       </div>
     {/if}
 
-    <button onclick={handleBook} class="mt-auto bg-[#a3ccaf] hover:bg-[#8fbd9d] text-[#0f3d24] font-bold text-[13px] py-2.5 rounded-lg transition-colors w-full">
-      Book Room
-    </button>
+      <button onclick={handleBook} class="mt-auto w-full bg-[#2B4C7C] hover:bg-[#1f375a] text-white font-bold py-3 px-4 rounded-xl shadow-sm transition-all text-sm">
+        Confirm Quick Book
+      </button>
   </div>
 </div>
+
+{#if showSuccessModal}
+  <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl flex flex-col items-center text-center">
+      <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4 text-emerald-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+      </div>
+      <h3 class="text-lg font-bold text-gray-900 mb-2">Booking Confirmed!</h3>
+      <p class="text-sm text-gray-600 font-medium mb-6">{lastBookedDetails}</p>
+      <button onclick={() => showSuccessModal = false} class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl shadow-sm transition-colors text-sm">
+        Done
+      </button>
+    </div>
+  </div>
+{/if}

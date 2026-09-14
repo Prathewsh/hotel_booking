@@ -2,31 +2,22 @@
   import RoomTile from "./RoomTile.svelte";
   import RoomModal from "./RoomModal.svelte";
 
-  type Status = 'available' | 'occupied' | 'dirty' | 'maintenance' | 'blocked';
-  type Room = { n: string; s: string; type: string };
+  import { roomState, type Room, type Status } from '$lib/stores/roomStore.svelte';
 
   let modalRoom: Room | null = $state(null);
 
-  let rooms = $state<Room[]>([
-    { n: 'R101', s: 'available', type: 'Deluxe Room' },
-    { n: 'R102', s: 'occupied', type: 'Deluxe Room' },
-    { n: 'R201', s: 'available', type: 'Executive Suite' },
-    { n: 'R202', s: 'maintenance', type: 'Executive Suite' },
-    { n: 'R301', s: 'available', type: 'Family Room' },
-  ]);
+  const floor1 = $derived(roomState.rooms.filter(r => r.code.startsWith('R1')));
+  const floor2 = $derived(roomState.rooms.filter(r => r.code.startsWith('R2')));
+  const floor3 = $derived(roomState.rooms.filter(r => r.code.startsWith('R3')));
 
-  const floor1 = $derived(rooms.filter(r => r.n.startsWith('R1')));
-  const floor2 = $derived(rooms.filter(r => r.n.startsWith('R2')));
-  const floor3 = $derived(rooms.filter(r => r.n.startsWith('R3')));
-
-  const occupiedCount = $derived(rooms.filter(r => r.s === 'occupied').length);
-  const occupiedPct = $derived(Math.round((occupiedCount / rooms.length) * 100));
-  const occupiedDash = $derived(Math.round((occupiedCount / rooms.length) * 100));
+  const occupiedCount = $derived(roomState.rooms.filter(r => r.status === 'occupied').length);
+  const occupiedPct = $derived(Math.round((occupiedCount / roomState.rooms.length) * 100));
+  const occupiedDash = $derived(Math.round((occupiedCount / roomState.rooms.length) * 100));
 
   function handleSave(newStatus: Status) {
     if (modalRoom) {
-      const idx = rooms.indexOf(modalRoom);
-      if (idx !== -1) rooms[idx].s = newStatus;
+      const idx = roomState.rooms.indexOf(modalRoom);
+      if (idx !== -1) roomState.rooms[idx].status = newStatus;
       modalRoom = null;
     }
   }
@@ -46,7 +37,7 @@
       Room Status - Interactive Floor View
     </h2>
     <p class="text-xs text-gray-500 font-medium">
-      {rooms.length} rooms across your property
+      {roomState.rooms.length} rooms across your property
     </p>
   </div>
 
@@ -61,7 +52,7 @@
           </div>
           <div class="flex gap-2.5">
             {#each floor1 as room}
-              <RoomTile number={room.n} status={room.s as any} onclick={() => modalRoom = room} />
+              <RoomTile number={room.code} status={room.status as any} onclick={() => modalRoom = room} />
             {/each}
           </div>
         </div>
@@ -76,7 +67,7 @@
           </div>
           <div class="flex gap-2.5">
             {#each floor2 as room}
-              <RoomTile number={room.n} status={room.s as any} onclick={() => modalRoom = room} />
+              <RoomTile number={room.code} status={room.status as any} onclick={() => modalRoom = room} />
             {/each}
           </div>
         </div>
@@ -91,7 +82,7 @@
           </div>
           <div class="flex gap-2.5">
             {#each floor3 as room}
-              <RoomTile number={room.n} status={room.s as any} onclick={() => modalRoom = room} />
+              <RoomTile number={room.code} status={room.status as any} onclick={() => modalRoom = room} />
             {/each}
           </div>
         </div>
@@ -120,7 +111,7 @@
           />
         </svg>
         <div class="absolute inset-0 flex flex-col items-center justify-center">
-          <span class="text-2xl font-extrabold text-gray-900 leading-none">{rooms.length}</span>
+          <span class="text-2xl font-extrabold text-gray-900 leading-none">{roomState.rooms.length}</span>
           <span class="text-xs font-bold text-gray-600 leading-tight">Rooms</span>
           <span class="text-xs font-bold text-gray-600 leading-tight">Total</span>
         </div>
@@ -146,8 +137,9 @@
 
 {#if modalRoom}
   <RoomModal
-    roomNumber={modalRoom.n}
-    currentStatus={modalRoom.s as any}
+    isOpen={true}
+    roomNumber={modalRoom.code}
+    currentStatus={modalRoom.status as any}
     onClose={() => modalRoom = null}
     onSave={handleSave}
   />

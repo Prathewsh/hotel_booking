@@ -1,18 +1,12 @@
 <script lang="ts">
-  const rooms = [
-    { code: 'R101', type: 'Deluxe Room', price: 3500, maxGuests: 2, status: 'available' },
-    { code: 'R102', type: 'Deluxe Room', price: 3500, maxGuests: 2, status: 'occupied' },
-    { code: 'R201', type: 'Executive Suite', price: 5800, maxGuests: 3, status: 'available' },
-    { code: 'R202', type: 'Executive Suite', price: 5800, maxGuests: 3, status: 'maintenance' },
-    { code: 'R301', type: 'Family Room', price: 4200, maxGuests: 4, status: 'available' },
-  ];
+  import { roomState } from '$lib/stores/roomStore.svelte';
 
-  const totalRooms = rooms.length;
-  const occupiedRooms = rooms.filter(r => r.status === 'occupied');
-  const occupancyPct = Math.round((occupiedRooms.length / totalRooms) * 100);
-  const pendingCheckins = 1;
-  const pendingDepartures = occupiedRooms.length;
-  const revenueToday = occupiedRooms.reduce((sum, r) => sum + r.price, 0);
+  const totalRooms = $derived(roomState.rooms.length);
+  const occupiedRooms = $derived(roomState.rooms.filter(r => r.status === 'occupied'));
+  const occupancyPct = $derived(Math.round((occupiedRooms.length / totalRooms) * 100));
+  const pendingCheckins = 0;
+  const pendingDepartures = $derived(occupiedRooms.length);
+  const revenueToday = $derived(roomState.revenue);
 </script>
 
 <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex flex-col w-full h-full">
