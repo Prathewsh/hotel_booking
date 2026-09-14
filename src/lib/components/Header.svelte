@@ -1,8 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
+  import { uiState } from '$lib/stores/roomStore.svelte';
+
   let searchQuery = $state("");
   let now = $state(new Date());
+  let showQuickActions = $state(false);
 
   onMount(() => {
     const interval = setInterval(() => {
@@ -94,12 +97,34 @@
       >
       {formattedDateTime}
     </div>
-    <button
-      class="bg-[#2c4c7c] hover:bg-[#1f375a] text-white rounded-full px-4 py-2 text-sm font-medium flex items-center transition-colors shadow-sm"
-    >
-      <span class="mr-2">$</span>
-      Quick Actions
-    </button>
+    <div class="relative">
+      <button
+        onclick={() => showQuickActions = !showQuickActions}
+        class="bg-[#2c4c7c] hover:bg-[#1f375a] text-white rounded-full px-4 py-2 text-sm font-medium flex items-center transition-colors shadow-sm"
+      >
+        <span class="mr-2">$</span>
+        Quick Actions
+      </button>
+
+      {#if showQuickActions}
+        <div class="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+          <button 
+            onclick={() => { uiState.checkinModalOpen = true; showQuickActions = false; }} 
+            class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center"
+          >
+            <svg class="w-4 h-4 mr-2 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+            Guest Check-In
+          </button>
+          <button 
+            onclick={() => { uiState.checkoutModalOpen = true; showQuickActions = false; }} 
+            class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center"
+          >
+            <svg class="w-4 h-4 mr-2 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+            Guest Check-Out
+          </button>
+        </div>
+      {/if}
+    </div>
     <div class="relative">
       <button
         class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-white shadow-sm flex items-center justify-center"

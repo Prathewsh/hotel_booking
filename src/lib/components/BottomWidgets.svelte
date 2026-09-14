@@ -22,6 +22,15 @@
   let checkIn = $state('');
   let checkOut = $state('');
   let error = $state('');
+
+  const maxHotelCapacity = $derived(Math.max(...roomState.rooms.map(r => r.maxGuests)));
+  
+  $effect(() => {
+    if (guestFilter > maxHotelCapacity) {
+      guestFilter = maxHotelCapacity;
+    }
+  });
+
   let showSuccessModal = $state(false);
   let lastBookedDetails = $state('');
 
@@ -109,7 +118,7 @@
       <div class="grid grid-cols-[80px_1fr] gap-3">
         <div class="relative">
           <label for="widget-guests" class="absolute -top-2 left-3 bg-white px-1 text-[11px] font-semibold text-slate-500 z-10">Guests</label>
-          <input type="number" id="widget-guests" min="1" bind:value={guestFilter} class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 shadow-sm outline-none focus:border-gray-300" />
+          <input type="number" id="widget-guests" min="1" max={maxHotelCapacity} bind:value={guestFilter} class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 shadow-sm outline-none focus:border-gray-300" />
         </div>
         <div class="relative">
           <label for="widget-room-select" class="absolute -top-2 left-3 bg-white px-1 text-[11px] font-semibold text-slate-500 z-10">Room</label>

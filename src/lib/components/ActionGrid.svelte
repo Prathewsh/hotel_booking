@@ -2,22 +2,20 @@
   import ActionCard from './ActionCard.svelte';
   import CheckinModal from './CheckinModal.svelte';
   import CheckoutModal from './CheckoutModal.svelte';
-
   import ComingSoonModal from './ComingSoonModal.svelte';
+  import { uiState } from '$lib/stores/roomStore.svelte';
 
-  let checkinOpen = $state(false);
-  let checkoutOpen = $state(false);
   let staffOpen = $state(false);
 </script>
 
 <div class="grid grid-cols-6 gap-3 w-full">
-  <ActionCard title="Guest Check-in" iconBgColor="bg-emerald-50" iconColor="text-emerald-500" onclick={() => checkinOpen = true}>
+  <ActionCard title="Guest Check-in" iconBgColor="bg-emerald-50" iconColor="text-emerald-500" onclick={() => uiState.checkinModalOpen = true}>
     {#snippet icon()}
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
     {/snippet}
   </ActionCard>
 
-  <ActionCard title="Guest Check-Out" iconBgColor="bg-rose-50" iconColor="text-rose-500" onclick={() => checkoutOpen = true}>
+  <ActionCard title="Guest Check-Out" iconBgColor="bg-rose-50" iconColor="text-rose-500" onclick={() => uiState.checkoutModalOpen = true}>
     {#snippet icon()}
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
     {/snippet}
@@ -91,8 +89,8 @@
   </ActionCard>
 </div>
 
-<CheckinModal bind:isOpen={checkinOpen} />
-<CheckoutModal bind:isOpen={checkoutOpen} />
+<CheckinModal bind:isOpen={uiState.checkinModalOpen} />
+<CheckoutModal bind:isOpen={uiState.checkoutModalOpen} />
 
 <ComingSoonModal 
   bind:isOpen={staffOpen} 

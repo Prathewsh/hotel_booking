@@ -4,6 +4,7 @@
   import OperationalOverview from '$lib/components/OperationalOverview.svelte';
   import RoomInteractiveFloorView from '$lib/components/RoomInteractiveFloorView.svelte';
   import BottomWidgets from '$lib/components/BottomWidgets.svelte';
+  import WelcomeModal from '$lib/components/WelcomeModal.svelte';
 </script>
 
 <div class="w-full">
@@ -23,3 +24,5 @@
     <BottomWidgets />
   </main>
 </div>
+
+<WelcomeModal />

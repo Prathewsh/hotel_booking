@@ -11,3 +11,8 @@ export const roomState = $state({
     { code: 'R301', type: 'Family Room', price: 4200, maxGuests: 4, status: 'available' as Status },
   ]
 });
+
+export const uiState = $state({
+  checkinModalOpen: false,
+  checkoutModalOpen: false,
+});
