@@ -4,6 +4,7 @@
   import { uiState, roomState } from '$lib/stores/roomStore.svelte';
 
   let searchQuery = $state("");
+  let searchInput = $state<HTMLInputElement | null>(null);
   let isSearchFocused = $state(false);
   let now = $state(new Date());
   let showQuickActions = $state(false);
@@ -40,6 +41,13 @@
     }
   }
 </script>
+
+<svelte:window onkeydown={(e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      searchInput?.focus();
+    }
+  }} />
 
 <header
   class="flex items-center justify-between px-6 py-3 bg-white border-b border-gray-200 mb-6"
@@ -85,6 +93,7 @@
     </div>
     <input
       type="text"
+      bind:this={searchInput}
       bind:value={searchQuery}
       onfocus={() => isSearchFocused = true}
       onblur={() => setTimeout(() => isSearchFocused = false, 200)}
