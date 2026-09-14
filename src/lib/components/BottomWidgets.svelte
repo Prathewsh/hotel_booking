@@ -18,6 +18,7 @@
   };
 
   let selectedRoom = $state('');
+  let guestFilter = $state(1);
   let checkIn = $state('');
   let checkOut = $state('');
   let error = $state('');
@@ -46,6 +47,7 @@
     if (!selectedRoom) { error = 'Please select a room.'; return false; }
     if (!room) { error = 'Invalid room selected.'; return false; }
     if (room.status !== 'available') { error = `${room.code} is currently ${room.status}. Only available rooms can be booked.`; return false; }
+    if (guestFilter > room.maxGuests) { error = `${room.code} can only accommodate up to ${room.maxGuests} guests.`; return false; }
     if (!checkIn) { error = 'Please select a check-in date.'; return false; }
     if (!checkOut) { error = 'Please select a check-out date.'; return false; }
     if (checkIn < today) { error = 'Check-in date cannot be in the past.'; return false; }
@@ -67,6 +69,7 @@
       showSuccessModal = true;
       
       selectedRoom = '';
+      guestFilter = 1;
       checkIn = '';
       checkOut = '';
     }
@@ -103,14 +106,20 @@
     <h2 class="text-[15px] font-bold text-[#1e293b] mb-4">Quick Room Booking</h2>
 
     <div class="flex flex-col gap-3 mb-4">
-      <div class="relative">
-        <label for="room-select" class="absolute -top-2 left-3 bg-white px-1 text-[11px] font-semibold text-slate-500 z-10">Room</label>
-        <select id="room-select" bind:value={selectedRoom} class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 shadow-sm outline-none focus:border-gray-300 bg-white cursor-pointer">
-          <option value="">Select a room</option>
-          {#each roomState.rooms as r}
-            <option value={r.code}>{r.code} — {r.type} [{statusLabels[r.status]}] (₹{r.price.toLocaleString()}/night)</option>
-          {/each}
-        </select>
+      <div class="grid grid-cols-[80px_1fr] gap-3">
+        <div class="relative">
+          <label for="widget-guests" class="absolute -top-2 left-3 bg-white px-1 text-[11px] font-semibold text-slate-500 z-10">Guests</label>
+          <input type="number" id="widget-guests" min="1" bind:value={guestFilter} class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 shadow-sm outline-none focus:border-gray-300" />
+        </div>
+        <div class="relative">
+          <label for="widget-room-select" class="absolute -top-2 left-3 bg-white px-1 text-[11px] font-semibold text-slate-500 z-10">Room</label>
+          <select id="widget-room-select" bind:value={selectedRoom} class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 shadow-sm outline-none focus:border-gray-300 bg-white cursor-pointer">
+            <option value="">Select a room</option>
+            {#each roomState.rooms.filter(r => r.maxGuests >= guestFilter) as r}
+              <option value={r.code}>{r.code} — {r.type} [{statusLabels[r.status]}] (₹{r.price.toLocaleString()}/night)</option>
+            {/each}
+          </select>
+        </div>
       </div>
 
       <div class="grid grid-cols-2 gap-3">
