@@ -12,7 +12,7 @@
       class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden"
     >
       <img
-        src="https://ui-avatars.com/api/?name=Raintech&background=random"
+        src="/images/raintech_logo.webp"
         alt="Hotel Logo"
         class="w-full h-full object-cover"
       />
