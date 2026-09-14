@@ -1,9 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { uiState } from '$lib/stores/roomStore.svelte';
+  import { uiState, roomState } from '$lib/stores/roomStore.svelte';
 
   let searchQuery = $state("");
+  let isSearchFocused = $state(false);
   let now = $state(new Date());
   let showQuickActions = $state(false);
 
@@ -19,6 +20,25 @@
     ' | ' +
     now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
   );
+
+  const searchResults = $derived(
+    searchQuery.trim() === "" 
+      ? [] 
+      : roomState.rooms.filter(r => 
+          r.code.toLowerCase().includes(searchQuery.toLowerCase()) || 
+          r.type.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+  );
+
+  function getStatusColor(status: string) {
+    switch (status) {
+      case 'available': return 'bg-emerald-100 text-emerald-700';
+      case 'occupied': return 'bg-rose-100 text-rose-700';
+      case 'dirty': return 'bg-amber-100 text-amber-700';
+      case 'maintenance': return 'bg-slate-100 text-slate-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
+  }
 </script>
 
 <header
@@ -66,6 +86,8 @@
     <input
       type="text"
       bind:value={searchQuery}
+      onfocus={() => isSearchFocused = true}
+      onblur={() => setTimeout(() => isSearchFocused = false, 200)}
       placeholder="Search guests, rooms, reservations, staff..."
       class="w-full bg-white rounded-full py-2 pl-10 pr-16 text-sm text-gray-700 shadow-sm border-transparent focus:border-primary focus:ring-0"
     />
@@ -77,6 +99,38 @@
         >Ctrl/Cmd K</span
       >
     </div>
+
+    {#if isSearchFocused && searchQuery.trim() !== ""}
+      <div class="absolute top-full left-0 w-full mt-2 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50 overflow-hidden">
+        {#if searchResults.length === 0}
+          <div class="px-4 py-3 text-sm text-gray-500 text-center">No results found for "{searchQuery}"</div>
+        {:else}
+          <div class="px-3 pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Rooms</div>
+          {#each searchResults as room}
+            <button 
+              onclick={() => { 
+                uiState.selectedRoomForCheckin = room.code; 
+                uiState.checkinModalOpen = true; 
+                isSearchFocused = false; 
+                searchQuery = ""; 
+              }}
+              class="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center justify-between transition-colors"
+            >
+              <div class="flex flex-col">
+                <span class="text-sm font-bold text-gray-800">{room.code}</span>
+                <span class="text-xs text-gray-500">{room.type}</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-semibold text-gray-700">₹{room.price.toLocaleString()}</span>
+                <span class={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${getStatusColor(room.status)}`}>
+                  {room.status}
+                </span>
+              </div>
+            </button>
+          {/each}
+        {/if}
+      </div>
+    {/if}
   </div>
 
   <div class="flex items-center space-x-4">

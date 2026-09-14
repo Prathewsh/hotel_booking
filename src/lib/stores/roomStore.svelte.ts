@@ -15,4 +15,5 @@ export const roomState = $state({
 export const uiState = $state({
   checkinModalOpen: false,
   checkoutModalOpen: false,
+  selectedRoomForCheckin: '',
 });

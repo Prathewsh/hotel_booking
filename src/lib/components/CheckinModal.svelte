@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { roomState, type Status } from '$lib/stores/roomStore.svelte';
+  import { roomState, uiState, type Status } from '$lib/stores/roomStore.svelte';
 
   let { isOpen = $bindable(false) } = $props();
 
@@ -22,6 +22,13 @@
   $effect(() => {
     if (guestFilter > maxHotelCapacity) {
       guestFilter = maxHotelCapacity;
+    }
+  });
+
+  $effect(() => {
+    if (isOpen && uiState.selectedRoomForCheckin) {
+      selectedRoom = uiState.selectedRoomForCheckin;
+      uiState.selectedRoomForCheckin = '';
     }
   });
 
